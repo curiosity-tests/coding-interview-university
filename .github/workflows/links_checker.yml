@@ -1,13 +1,31 @@
 name: Links Checker
+run-name: "Links Checker ${{ inputs.leg || github.event_name }} ${{ inputs.racecar_run }}"
 
 on:
   ## Allow triggering this workflow manually via GitHub CLI/web
   workflow_dispatch:
+    inputs:
+      leg:
+        description: "baseline (uninstrumented) or instrumented (under chalk/curiosity)"
+        type: choice
+        options: [instrumented, baseline]
+        default: baseline
+      profile:
+        description: "CrashOverride chalk profile"
+        type: string
+        default: curiosity-tests-racecar
+      racecar_run:
+        description: "racecar correlation token, echoed into the run name"
+        type: string
+        default: ""
 
   ## Run this workflow automatically every month
   schedule:
     - cron: '0 0 1 * *'
 
+
+env:
+  CHALK_ON: ${{ inputs.leg == 'instrumented' }}
 jobs:
   link_checker:
     name: Check links and create automated issue if needed
